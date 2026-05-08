@@ -1,5 +1,6 @@
-const BACKEND_HOST = window.location.hostname
-const BASE = `http://${BACKEND_HOST}:8000/api`
+import { BACKEND_URL } from '../config'
+
+const BASE = `${BACKEND_URL}/api`
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`)
@@ -12,7 +13,6 @@ export const api = {
   marketStatus: () => get<any>('/market/status'),
   gainers: () => get<any>('/stocks/gainers'),
   losers: () => get<any>('/stocks/losers'),
-  opportunities: () => get<any>('/stocks/opportunities'),
   alerts: () => get<any>('/alerts'),
   stockDetail: (symbol: string) => get<any>(`/stocks/${symbol}`),
   watchlist: () => get<any>('/watchlist'),

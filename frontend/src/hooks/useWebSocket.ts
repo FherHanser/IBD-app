@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { MarketState } from '../types'
+import { WS_URL } from '../config'
 
-const BACKEND_HOST = window.location.hostname
-const WS_URL = `ws://${BACKEND_HOST}:8000/ws/market`
 const RECONNECT_DELAY_MS = 3000
 
 export type WsStatus = 'connecting' | 'connected' | 'disconnected' | 'error'
