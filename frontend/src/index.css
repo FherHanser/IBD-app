@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface text-gray-100 font-mono;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-surface;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-border rounded-full;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface-card border border-surface-border rounded-xl p-4;
+  }
+
+  .tag-gain {
+    @apply text-gain text-xs font-semibold bg-gain-bg px-2 py-0.5 rounded;
+  }
+
+  .tag-loss {
+    @apply text-loss text-xs font-semibold bg-loss-bg px-2 py-0.5 rounded;
+  }
+
+  .tag-opportunity {
+    @apply text-opportunity text-xs font-semibold bg-opportunity-bg px-2 py-0.5 rounded;
+  }
+
+  .badge-risk-high {
+    @apply text-loss text-xs bg-loss-bg px-2 py-0.5 rounded-full;
+  }
+
+  .badge-risk-medium {
+    @apply text-opportunity text-xs bg-opportunity-bg px-2 py-0.5 rounded-full;
+  }
+
+  .badge-risk-low {
+    @apply text-gain text-xs bg-gain-bg px-2 py-0.5 rounded-full;
+  }
+}
