@@ -132,8 +132,15 @@ def generate_alerts(entries: list[dict], opp_entries: list[dict] = None) -> list
     opp_alerts = []
     action_alerts = []
 
-    # ── Oportunidades ordenadas por score ──
+    # ── Oportunidades ordenadas por score (deduplicadas por símbolo) ──
+    seen_symbols: set[str] = set()
+    unique_opps = []
     for e in sorted(opp_entries or [], key=lambda x: x.get("score", 0), reverse=True):
+        if e.get("symbol") not in seen_symbols:
+            seen_symbols.add(e.get("symbol"))
+            unique_opps.append(e)
+
+    for e in unique_opps:
         score    = e.get("score", 0)
         sym      = e.get("symbol", "")
         price    = e.get("price", 0)
