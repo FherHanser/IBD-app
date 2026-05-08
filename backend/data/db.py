@@ -5,6 +5,7 @@ Si DATABASE_URL no está configurado, todas las funciones son no-ops silenciosos
 
 import os
 import logging
+import asyncio
 
 try:
     import asyncpg
@@ -30,12 +31,18 @@ async def init_db():
         url = url.replace("postgres://", "postgresql://", 1)
 
     try:
-        _pool = await asyncpg.create_pool(
-            url, min_size=1, max_size=3,
-            ssl="require" if "supabase" in url else None,
+        _pool = await asyncio.wait_for(
+            asyncpg.create_pool(
+                url, min_size=1, max_size=3,
+                ssl=True if "supabase" in url else None,
+            ),
+            timeout=15,
         )
         await _create_tables()
         logger.info("Base de datos conectada correctamente")
+    except asyncio.TimeoutError:
+        logger.warning("DB connection timeout (15s) — win rate tracking deshabilitado")
+        _pool = None
     except Exception as e:
         logger.error(f"Error conectando a DB: {e}")
         _pool = None
