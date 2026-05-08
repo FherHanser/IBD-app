@@ -122,53 +122,74 @@ def get_signal_age(symbol: str, current_price: float) -> dict | None:
         return None
 
 
-def generate_alerts(entries: list[dict]) -> list[dict]:
-    """Genera lista de alertas basada en los entries procesados."""
-    alerts = []
+def generate_alerts(entries: list[dict], opp_entries: list[dict] = None) -> list[dict]:
+    """
+    Alertas en dos secciones:
+    1. Oportunidades de compra (opp_entries) ordenadas de mayor a menor score.
+    2. Movimientos extremos del día (ganadoras/perdedoras con volumen).
+    """
     now = datetime.now(pytz.timezone("America/New_York")).isoformat()
+    opp_alerts = []
+    action_alerts = []
 
-    for e in entries:
-        change   = e.get("change_pct", 0)
-        vol_rel  = e.get("volume_relative", 1.0) or 1.0
+    # ── Oportunidades ordenadas por score ──
+    for e in sorted(opp_entries or [], key=lambda x: x.get("score", 0), reverse=True):
         score    = e.get("score", 0)
         sym      = e.get("symbol", "")
         price    = e.get("price", 0)
         rsi      = e.get("rsi")
-        sig_type = e.get("signal_type", "info")
-        setup    = e.get("setup_label", "")
         rs_spy   = e.get("rs_spy")
+        setup    = e.get("setup_label", "")
+        vol_rel  = e.get("volume_relative", 1.0) or 1.0
+        rr       = (e.get("trade_levels") or {}).get("rr1")
+
+        parts = [f"Score {score}"]
+        if setup and setup != "Sin setup":
+            parts.append(setup)
+        if rsi:
+            parts.append(f"RSI {rsi:.0f}")
+        if rs_spy is not None:
+            parts.append(f"RS {rs_spy:+.1f}%")
+        if rr:
+            parts.append(f"R:R {rr}")
+
+        opp_alerts.append({
+            "symbol":    sym,
+            "price":     price,
+            "type":      "opportunity_alert",
+            "severity":  "high" if score >= 75 else "medium" if score >= 60 else "low",
+            "message":   " · ".join(parts),
+            "timestamp": now,
+            "score":     score,
+        })
+
+    # ── Movimientos extremos del día ──
+    for e in entries:
+        change  = e.get("change_pct", 0)
+        vol_rel = e.get("volume_relative", 1.0) or 1.0
+        sym     = e.get("symbol", "")
+        price   = e.get("price", 0)
 
         if change > 5 and vol_rel > 2:
-            alerts.append({
+            action_alerts.append({
                 "symbol": sym, "price": price,
                 "type": "gainer_alert",
                 "severity": "high" if change > 8 else "medium",
-                "message": f"{sym} sube {change:.1f}% con volumen {vol_rel:.1f}×. Riesgo de entrada tardía.",
+                "message": f"Sube {change:.1f}% con volumen {vol_rel:.1f}×",
                 "timestamp": now,
+                "score": 0,
             })
         elif change < -8 and vol_rel > 1.5:
-            alerts.append({
+            action_alerts.append({
                 "symbol": sym, "price": price,
                 "type": "loser_alert",
                 "severity": "high" if change < -12 else "medium",
-                "message": f"{sym} cae {change:.1f}% con volumen {vol_rel:.1f}×. Esperar estabilización.",
+                "message": f"Cae {change:.1f}% con volumen {vol_rel:.1f}×",
                 "timestamp": now,
-            })
-        elif score >= 65 and sig_type == "buy_watch":
-            rs_txt = f" RS vs SPY: {rs_spy:+.1f}%." if rs_spy is not None else ""
-            rsi_txt = f" RSI {rsi:.0f}." if rsi else ""
-            setup_txt = f" Setup: {setup}." if setup else ""
-            alerts.append({
-                "symbol": sym, "price": price,
-                "type": "opportunity_alert",
-                "severity": "high" if score >= 75 else "medium",
-                "message": f"{sym} score {score}.{rsi_txt}{rs_txt}{setup_txt}",
-                "timestamp": now,
+                "score": 0,
             })
 
-    severity_order = {"high": 0, "medium": 1, "low": 2}
-    alerts.sort(key=lambda a: severity_order.get(a["severity"], 2))
-    return alerts[:20]
+    return (opp_alerts + action_alerts)[:20]
 
 
 def get_market_session() -> dict:

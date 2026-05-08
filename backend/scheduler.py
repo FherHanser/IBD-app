@@ -80,10 +80,10 @@ async def _update_market_data():
         # Calcular rankings
         rankings = compute_rankings(snapshots)
 
-        # Generar alertas usando todos los candidatos de oportunidad
+        # Generar alertas: oportunidades primero por score, luego movimientos extremos
         all_opp = rankings["opp_low"] + rankings["opp_mid"] + rankings["opp_top"]
         all_entries = rankings["gainers"] + rankings["losers"] + all_opp
-        alerts = generate_alerts(all_entries)
+        alerts = generate_alerts(all_entries, opp_entries=all_opp)
 
         # Persistencia: cerrar alertas de ayer + guardar nuevas oportunidades
         price_map = {s["symbol"]: s["price"] for s in snapshots if "price" in s}
