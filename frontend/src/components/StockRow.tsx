@@ -115,6 +115,33 @@ export default function StockRow({ entry, variant, rank, onClick }: Props) {
           </span>
         )}
 
+        {/* Z-Score (solo oportunidades) */}
+        {variant === 'opportunity' && entry.z_score !== null && (
+          <span className={
+            Math.abs(entry.z_score) <= 1.0 ? 'text-gain' :
+            Math.abs(entry.z_score) <= 1.8 ? 'text-opportunity' :
+            'text-loss'
+          } title={`Z-Score: ${entry.z_score > 0 ? '+' : ''}${entry.z_score} — ${
+            entry.z_score > 1.8  ? 'Sobrecomprado, riesgo de reversa' :
+            entry.z_score < -1.8 ? 'Sobrevendido, posible rebote' :
+            entry.z_score > 0    ? 'Por encima de media, momentum ok' :
+                                   'Por debajo de media, zona de valor'
+          }`}>
+            Z {entry.z_score > 0 ? '+' : ''}{entry.z_score.toFixed(1)}
+          </span>
+        )}
+
+        {/* R:R (solo oportunidades) */}
+        {variant === 'opportunity' && entry.trade_levels && (
+          <span className={
+            entry.trade_levels.rr1 >= 2.5 ? 'text-gain font-semibold' :
+            entry.trade_levels.rr1 >= 1.5 ? 'text-opportunity' :
+            'text-gray-500'
+          } title={`Riesgo/Recompensa: por cada $1 arriesgado, potencial ganancia de $${entry.trade_levels.rr1.toFixed(1)}`}>
+            R:R {entry.trade_levels.rr1.toFixed(1)}
+          </span>
+        )}
+
         {/* Tendencia */}
         <span className={
           entry.ema_trend === 'alcista' ? 'text-gain' :

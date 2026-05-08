@@ -71,6 +71,8 @@ export interface StockEntry {
   // Fuerza relativa
   rs_spy: number | null
   rs_qqq: number | null
+  // Z-Score intraday
+  z_score: number | null
 }
 
 export interface Alert {

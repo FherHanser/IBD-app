@@ -96,6 +96,8 @@ def build_stock_entry(snapshot: dict, spy_change: float = 0.0, qqq_change: float
         # Fuerza relativa vs mercado
         "rs_spy": rs_spy,
         "rs_qqq": rs_qqq,
+        # Z-Score intraday
+        "z_score": indicators.get("z_score"),
     }
 
 

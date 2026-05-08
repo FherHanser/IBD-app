@@ -322,6 +322,24 @@ export default function StockDetailModal({ entry, onClose }: Props) {
                   note={entry.range_pct > 5 ? 'Día volátil' : ''}
                 />
               )}
+              {entry.z_score !== null && entry.z_score !== undefined && (
+                <IndicatorRow
+                  label="Z-Score"
+                  value={`${entry.z_score > 0 ? '+' : ''}${entry.z_score.toFixed(2)}`}
+                  color={
+                    Math.abs(entry.z_score) <= 1.0 ? 'text-gain' :
+                    Math.abs(entry.z_score) <= 1.8 ? 'text-opportunity' :
+                    'text-loss'
+                  }
+                  note={
+                    entry.z_score > 1.8  ? 'Sobrecomprado — riesgo de reversa' :
+                    entry.z_score > 1.0  ? 'Estirado al alza — entrada con precaución' :
+                    entry.z_score < -1.8 ? 'Sobrevendido — posible rebote técnico' :
+                    entry.z_score < -1.0 ? 'Zona de valor — precio bajo su media' :
+                    'Zona neutra — precio cerca de su media'
+                  }
+                />
+              )}
             </div>
           </div>
 

@@ -107,6 +107,17 @@ def calculate_indicators(df: pd.DataFrame, snapshot: dict = None) -> dict:
             result["above_vwap"]   = None
             result["pct_from_vwap"] = None
 
+        # --- Z-Score intraday: (precio - EMA20) / std20 ---
+        ema20_val = result.get("ema20")
+        if ema20_val and len(df) >= 5:
+            std20 = df["Close"].rolling(min(20, len(df))).std().iloc[-1]
+            if std20 and std20 > 0:
+                result["z_score"] = round((result["price"] - ema20_val) / float(std20), 2)
+            else:
+                result["z_score"] = None
+        else:
+            result["z_score"] = None
+
         # --- Tendencia EMA ---
         result["ema_trend"] = _classify_ema_trend(result)
 
@@ -184,7 +195,7 @@ def _empty_indicators() -> dict:
         "volume_relative": None, "price": None,
         "day_high": None, "day_low": None, "open": None,
         "making_new_lows": False, "above_vwap": None, "pct_from_vwap": None,
-        "ema_trend": "neutral",
+        "ema_trend": "neutral", "z_score": None,
         "gap_pct": None, "prev_close": None, "prev_high": None, "prev_low": None,
     }
     base.update(_empty_vwap())
