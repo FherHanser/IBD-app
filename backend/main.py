@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Iniciando Stock Monitor Backend...")
-    asyncio.create_task(init_db())  # no bloquea el arranque
+    await init_db()
     await start_scheduler()
     yield
     logger.info("Deteniendo scheduler...")
