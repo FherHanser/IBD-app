@@ -4,6 +4,7 @@ Si DATABASE_URL no está configurado, todas las funciones son no-ops silenciosos
 """
 
 import os
+import ssl
 import logging
 import asyncio
 
@@ -31,11 +32,14 @@ async def init_db():
         url = url.replace("postgres://", "postgresql://", 1)
 
     try:
+        ssl_ctx = None
+        if "supabase" in url:
+            ssl_ctx = ssl.create_default_context()
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl.CERT_NONE
+
         _pool = await asyncio.wait_for(
-            asyncpg.create_pool(
-                url, min_size=1, max_size=3,
-                ssl=True if "supabase" in url else None,
-            ),
+            asyncpg.create_pool(url, min_size=1, max_size=3, ssl=ssl_ctx),
             timeout=15,
         )
         await _create_tables()
