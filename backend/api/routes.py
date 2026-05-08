@@ -8,6 +8,7 @@ from analysis.signals import get_market_session
 from data.fetcher import get_last_fetch_time, get_quote_snapshot
 from analysis.rankings import build_stock_entry
 from data.universe import STOCK_UNIVERSE, get_company_name, COMPANY_NAMES
+from data.db import get_win_stats
 
 router = APIRouter()
 
@@ -128,6 +129,13 @@ def remove_from_watchlist(symbol: str):
     if symbol in _watchlist:
         _watchlist.remove(symbol)
     return {"message": f"{symbol} removido de watchlist", "watchlist": _watchlist}
+
+
+@router.get("/stats/winrate")
+async def get_winrate():
+    """Win rate histórico de alertas de oportunidad (últimos 30 días)."""
+    stats = await get_win_stats()
+    return {"data": stats}
 
 
 @router.get("/universe")

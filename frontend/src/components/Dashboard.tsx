@@ -53,9 +53,9 @@ export default function Dashboard({ data, wsStatus }: Props) {
         <section>
           <SectionLabel label="Tentación de Compra" accent />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-            <StockTable variant="opp_low" entries={data?.opp_low ?? []} loading={loading} onSelectStock={setSelectedStock} />
-            <StockTable variant="opp_mid" entries={data?.opp_mid ?? []} loading={loading} onSelectStock={setSelectedStock} />
-            <StockTable variant="opp_top" entries={data?.opp_top ?? []} loading={loading} onSelectStock={setSelectedStock} />
+            <StockTable variant="opp_low" entries={data?.opp_low ?? []} loading={loading} onSelectStock={setSelectedStock} winStats={data?.win_stats?.opp_low} />
+            <StockTable variant="opp_mid" entries={data?.opp_mid ?? []} loading={loading} onSelectStock={setSelectedStock} winStats={data?.win_stats?.opp_mid} />
+            <StockTable variant="opp_top" entries={data?.opp_top ?? []} loading={loading} onSelectStock={setSelectedStock} winStats={data?.win_stats?.opp_top} />
           </div>
         </section>
 

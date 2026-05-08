@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { TrendingUp, TrendingDown, DollarSign, Zap, Crown, Loader2, ChevronDown } from 'lucide-react'
-import { StockEntry } from '../types'
+import { StockEntry, WinRangeStats } from '../types'
 import StockRow from './StockRow'
 
 type Variant = 'gainer' | 'loser' | 'opp_low' | 'opp_mid' | 'opp_top'
@@ -10,6 +10,7 @@ interface Props {
   entries: StockEntry[]
   loading?: boolean
   onSelectStock: (entry: StockEntry) => void
+  winStats?: WinRangeStats
 }
 
 const CONFIG: Record<Variant, {
@@ -70,7 +71,7 @@ const CONFIG: Record<Variant, {
 
 const OPP_VARIANTS = new Set<Variant>(['opp_low', 'opp_mid', 'opp_top'])
 
-export default function StockTable({ variant, entries, loading, onSelectStock }: Props) {
+export default function StockTable({ variant, entries, loading, onSelectStock, winStats }: Props) {
   const { title, subtitle, Icon, headerColor, borderColor, accentColor, emptyMsg } = CONFIG[variant]
   const isOpp = OPP_VARIANTS.has(variant)
   const [isOpen, setIsOpen] = useState(true)
@@ -109,6 +110,21 @@ export default function StockTable({ variant, entries, loading, onSelectStock }:
       {/* Subtítulo visible en móvil cuando está abierto */}
       {isOpen && (
         <p className="sm:hidden text-xs text-gray-600 px-4 pb-2 -mt-1">{subtitle}</p>
+      )}
+
+      {/* Win rate badge — solo oportunidades con datos suficientes */}
+      {isOpp && winStats && winStats.total >= 5 && (
+        <div className="px-4 pb-2 -mt-1 flex items-center gap-2">
+          <span className={`text-xs font-bold ${winStats.win_rate >= 60 ? 'text-gain' : winStats.win_rate >= 40 ? 'text-opportunity' : 'text-loss'}`}>
+            {winStats.win_rate.toFixed(0)}% ganó
+          </span>
+          <span className="text-gray-600 text-xs">·</span>
+          <span className={`text-xs ${winStats.avg_return >= 0 ? 'text-gain' : 'text-loss'}`}>
+            avg {winStats.avg_return >= 0 ? '+' : ''}{winStats.avg_return.toFixed(1)}%
+          </span>
+          <span className="text-gray-600 text-xs">·</span>
+          <span className="text-xs text-gray-600">{winStats.total} señales · 30d</span>
+        </div>
       )}
 
       {/* Separador */}

@@ -9,6 +9,7 @@ from config import FRONTEND_URL, BACKEND_PORT
 from api.routes import router
 from api.websocket import ws_router
 from scheduler import start_scheduler, stop_scheduler
+from data.db import init_db, close_db
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,10 +21,12 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Iniciando Stock Monitor Backend...")
+    await init_db()
     await start_scheduler()
     yield
     logger.info("Deteniendo scheduler...")
     await stop_scheduler()
+    await close_db()
 
 
 app = FastAPI(

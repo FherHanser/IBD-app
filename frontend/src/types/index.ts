@@ -92,6 +92,14 @@ export interface MarketSession {
   date: string
 }
 
+export interface WinRangeStats {
+  total: number
+  wins: number
+  win_rate: number
+  avg_return: number
+  best_return: number
+}
+
 export interface MarketState {
   type: string
   last_update: string | null
@@ -104,4 +112,5 @@ export interface MarketState {
   alerts: Alert[]
   total_processed: number
   status: string
+  win_stats: Record<string, WinRangeStats>
 }

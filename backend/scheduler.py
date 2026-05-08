@@ -16,6 +16,7 @@ from data.universe import STOCK_UNIVERSE
 from data.fetcher import get_quote_snapshot, fetch_detailed, fetch_daily_context
 from analysis.rankings import compute_rankings
 from analysis.signals import generate_alerts, get_market_session
+from data.db import save_opportunity_alert, close_old_alerts, get_win_stats
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ market_state: dict = {
     "alerts": [],
     "total_processed": 0,
     "status": "initializing",
+    "win_stats": {},
 }
 
 # Callbacks WebSocket (registrados por api/websocket.py)
@@ -84,6 +86,23 @@ async def _update_market_data():
         all_entries = rankings["gainers"] + rankings["losers"] + all_opp
         alerts = generate_alerts(all_entries)
 
+        # Persistencia: cerrar alertas de ayer + guardar nuevas oportunidades
+        price_map = {s["symbol"]: s["price"] for s in snapshots if "price" in s}
+        await close_old_alerts(price_map)
+
+        for bucket, label in [("opp_low", "opp_low"), ("opp_mid", "opp_mid"), ("opp_top", "opp_top")]:
+            for entry in rankings[bucket]:
+                await save_opportunity_alert(
+                    symbol=entry["symbol"],
+                    price=entry["price"],
+                    score=entry["score"],
+                    signal_type=entry.get("signal_type", ""),
+                    setup_key=entry.get("setup_key", ""),
+                    price_range=label,
+                )
+
+        win_stats = await get_win_stats()
+
         # Actualizar estado global
         market_state.update({
             "last_update": datetime.utcnow().isoformat() + "Z",
@@ -96,6 +115,7 @@ async def _update_market_data():
             "alerts": alerts,
             "total_processed": rankings.get("total_processed", 0),
             "status": "ok",
+            "win_stats": win_stats,
         })
 
         logger.info(

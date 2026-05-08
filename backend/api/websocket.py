@@ -91,6 +91,7 @@ def _sanitize_state(state: dict) -> dict:
         "alerts":          state.get("alerts", []),
         "total_processed": state.get("total_processed", 0),
         "status":          state.get("status", "unknown"),
+        "win_stats":       state.get("win_stats", {}),
     }
 
 
