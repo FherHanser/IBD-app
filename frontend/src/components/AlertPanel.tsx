@@ -1,8 +1,10 @@
 import { Bell, TrendingUp, TrendingDown, Target, AlertTriangle } from 'lucide-react'
-import { Alert } from '../types'
+import { Alert, StockEntry } from '../types'
 
 interface Props {
   alerts: Alert[]
+  allEntries?: StockEntry[]
+  onSelectStock?: (entry: StockEntry) => void
 }
 
 const TYPE_CONFIG = {
@@ -50,7 +52,14 @@ function ScoreDot({ score }: { score: number }) {
   )
 }
 
-export default function AlertPanel({ alerts }: Props) {
+export default function AlertPanel({ alerts, allEntries = [], onSelectStock }: Props) {
+  const entryMap = Object.fromEntries(allEntries.map(e => [e.symbol, e]))
+
+  const handleClick = (symbol: string) => {
+    const entry = entryMap[symbol]
+    if (entry && onSelectStock) onSelectStock(entry)
+  }
+
   const oppAlerts    = alerts.filter(a => a.type === 'opportunity_alert')
   const actionAlerts = alerts.filter(a => a.type !== 'opportunity_alert')
 
@@ -80,7 +89,8 @@ export default function AlertPanel({ alerts }: Props) {
               {oppAlerts.map((alert, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-opportunity/20 bg-opportunity-bg"
+                  onClick={() => handleClick(alert.symbol)}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border border-opportunity/20 bg-opportunity-bg transition-colors ${entryMap[alert.symbol] ? 'cursor-pointer hover:border-opportunity/50 hover:bg-opportunity/10' : ''}`}
                 >
                   <span className="text-xs font-mono font-bold text-white w-5 text-right shrink-0">
                     {i + 1}
@@ -116,7 +126,8 @@ export default function AlertPanel({ alerts }: Props) {
                 return (
                   <div
                     key={i}
-                    className={`flex items-start gap-2 px-3 py-2 rounded-lg border ${border} ${bg}`}
+                    onClick={() => handleClick(alert.symbol)}
+                    className={`flex items-start gap-2 px-3 py-2 rounded-lg border ${border} ${bg} transition-colors ${entryMap[alert.symbol] ? 'cursor-pointer hover:opacity-80' : ''}`}
                   >
                     <Icon size={13} className={`${color} shrink-0 mt-0.5`} />
                     <div className="flex-1 min-w-0">

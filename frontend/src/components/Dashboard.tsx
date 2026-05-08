@@ -62,7 +62,17 @@ export default function Dashboard({ data, wsStatus }: Props) {
       </main>
 
       <div className="px-4 pb-4">
-        <AlertPanel alerts={data?.alerts ?? []} />
+        <AlertPanel
+          alerts={data?.alerts ?? []}
+          allEntries={[
+            ...(data?.gainers ?? []),
+            ...(data?.losers ?? []),
+            ...(data?.opp_low ?? []),
+            ...(data?.opp_mid ?? []),
+            ...(data?.opp_top ?? []),
+          ]}
+          onSelectStock={setSelectedStock}
+        />
       </div>
 
       <footer className="border-t border-surface-border px-4 py-2 text-xs text-gray-700 flex flex-col sm:flex-row sm:justify-between gap-1">
