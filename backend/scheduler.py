@@ -49,7 +49,7 @@ def register_broadcast(callback):
 
 async def _update_market_data():
     """Tarea principal: fetch + cálculo + actualización de estado."""
-    global market_state
+    global market_state, _consecutive_errors
 
     session = get_market_session()
     logger.info(f"Actualizando datos — Sesión: {session['label']}")
@@ -75,7 +75,6 @@ async def _update_market_data():
             if snap["symbol"] in detailed:
                 snap["df"] = detailed[snap["symbol"]]
 
-        global _consecutive_errors
         _consecutive_errors = 0  # reset en ciclo exitoso
 
         # Calcular rankings
@@ -129,7 +128,6 @@ async def _update_market_data():
             await _ws_broadcast_callback(market_state)
 
     except Exception as e:
-        global _consecutive_errors
         _consecutive_errors += 1
         logger.error(f"Error en _update_market_data ({_consecutive_errors} consecutivos): {e}", exc_info=True)
         # Solo marcar error si falla 3 veces seguidas y no hay datos previos

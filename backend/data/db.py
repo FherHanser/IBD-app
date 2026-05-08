@@ -5,7 +5,11 @@ Si DATABASE_URL no está configurado, todas las funciones son no-ops silenciosos
 
 import os
 import logging
-import asyncpg
+
+try:
+    import asyncpg
+except ImportError:
+    asyncpg = None  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +18,9 @@ _pool: asyncpg.Pool | None = None
 
 async def init_db():
     global _pool
+    if asyncpg is None:
+        logger.warning("asyncpg no disponible — win rate tracking deshabilitado")
+        return
     url = os.environ.get("DATABASE_URL", "")
     if not url:
         logger.warning("DATABASE_URL no configurado — win rate tracking deshabilitado")
