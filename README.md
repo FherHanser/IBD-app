@@ -14,14 +14,19 @@ Monitorea **142 acciones del mercado americano** en tiempo real, las clasifica a
 
 ### Backend (Python / FastAPI)
 - Cada 60s descarga precios, volumen y datos técnicos de todos los símbolos vía **Yahoo Finance**
-- Calcula indicadores: RSI, EMA20, VWAP, ATR, Z-Score, Fibonacci, RS vs SPY
+- Calcula indicadores: RSI, EMA20, VWAP, ATR, Z-Score, RS vs SPY
+- Calcula niveles de **Fibonacci** (23.6%, 38.2%, 50%, 61.8%, 78.6%) sobre el rango del día
+- Detecta confluencia en el nivel dorado 61.8% combinado con Z-Score para identificar zonas óptimas de compra
 - Asigna un **puntaje de 0–100** a cada acción según condiciones técnicas
 - Clasifica las acciones en categorías y genera alertas
 - Transmite el estado por **WebSocket** al frontend en tiempo real
 
 ### Frontend (React / TypeScript)
 - Recibe datos en tiempo real y renderiza sin recargar la página
-- Muestra semáforo 🟢🟡🔴 de confluencia técnica (Fibonacci 61.8% + Z-Score)
+- Muestra semáforo 🟢🟡🔴 de confluencia técnica directamente en cada tarjeta:
+  - 🟢 **Compra óptima** — precio en Fibonacci 61.8% ± 2% y Z-Score normalizado
+  - 🟡 **Preparar** — precio acercándose al nivel dorado (± 5%)
+  - 🔴 **Extendido** — precio muy alejado de su media (Z-Score > 1.5)
 - Modal de detalle con análisis completo al hacer clic en cualquier acción
 
 ### Persistencia (Supabase / PostgreSQL)
@@ -38,7 +43,7 @@ Monitorea **142 acciones del mercado americano** en tiempo real, las clasifica a
 | **Movimiento del día** | Top 10 ganadoras y perdedoras por % de cambio con volumen |
 | **Tentación de Compra** | Oportunidades por rango de precio: bajo (<$10), medio ($10–$50), alto (>$50) |
 | **Alertas Activas** | Mejores oportunidades ordenadas por puntaje + movimientos extremos del día |
-| **Modal de detalle** | Puntaje, señal, niveles de trade (entrada / stop / objetivo), Fibonacci, historial de señal |
+| **Modal de detalle** | Puntaje, señal, niveles de trade (entrada / stop / objetivo), análisis completo de Fibonacci con interpretación de cada nivel, historial de señal |
 
 ---
 
