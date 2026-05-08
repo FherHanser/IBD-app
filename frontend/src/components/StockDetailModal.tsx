@@ -2,7 +2,7 @@ import { X, BarChart2, Activity, Target, Clock, TrendingUp } from 'lucide-react'
 import { StockEntry } from '../types'
 import ScoreBar from './ScoreBar'
 import RiskBadge from './RiskBadge'
-import FibonacciAnalysis from './FibonacciAnalysis'
+import FibonacciAnalysis, { calcFibLevels, detectOptimalBuy } from './FibonacciAnalysis'
 
 interface Props {
   entry: StockEntry
@@ -26,6 +26,9 @@ export default function StockDetailModal({ entry, onClose }: Props) {
   const isPositive = entry.change_pct >= 0
   const changeColor = isPositive ? 'text-gain' : 'text-loss'
   const signalColor = SIGNAL_COLORS[entry.signal_type] ?? 'text-gray-400'
+
+  const fibLevels = entry.high > entry.low ? calcFibLevels(entry.high, entry.low) : []
+  const isOptimalBuy = fibLevels.length > 0 && detectOptimalBuy(entry, fibLevels)
 
   return (
     <div
@@ -61,6 +64,17 @@ export default function StockDetailModal({ entry, onClose }: Props) {
         </div>
 
         <div className="px-3 sm:px-6 py-4 sm:py-5 flex flex-col gap-4 sm:gap-6">
+
+          {/* Banner COMPRA ÓPTIMA — confluencia Fibonacci 61.8% + Z-Score */}
+          {isOptimalBuy && (
+            <div className="flex items-center gap-3 p-3 rounded-xl border-2 border-yellow-400 bg-yellow-400/10 shadow-lg shadow-yellow-400/10">
+              <span className="text-xl shrink-0">⭐</span>
+              <div>
+                <p className="text-sm font-bold text-yellow-400">COMPRA ÓPTIMA</p>
+                <p className="text-xs text-yellow-200/70">Fibonacci 61.8% + Z-Score neutro — confluencia de alta probabilidad</p>
+              </div>
+            </div>
+          )}
 
           {/* Señal + score */}
           <div className="flex flex-col sm:flex-row gap-3">

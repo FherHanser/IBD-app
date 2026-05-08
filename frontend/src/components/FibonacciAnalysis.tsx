@@ -8,7 +8,7 @@ interface FibLevel {
   isGolden: boolean
 }
 
-function calcFibLevels(high: number, low: number): FibLevel[] {
+export function calcFibLevels(high: number, low: number): FibLevel[] {
   const range = high - low
   const ratios = [
     { label: '0%',    ratio: 0,     isKey: false, isGolden: false },
@@ -76,6 +76,15 @@ interface Props {
   entry: StockEntry
 }
 
+export function detectOptimalBuy(entry: StockEntry, levels: FibLevel[]): boolean {
+  const fib618 = levels.find(l => l.ratio === 0.618)
+  if (!fib618) return false
+  const distPct = Math.abs(entry.price - fib618.price) / fib618.price * 100
+  const nearGolden = distPct <= 2.0
+  const zOptimal = entry.z_score !== null && entry.z_score >= -1.0 && entry.z_score <= 0.3
+  return nearGolden && zOptimal
+}
+
 export default function FibonacciAnalysis({ entry }: Props) {
   const { high, low, price, vwap, open } = entry
   const range = high - low
@@ -86,6 +95,7 @@ export default function FibonacciAnalysis({ entry }: Props) {
 
   const levels = calcFibLevels(high, low)
   const { level: nearestLevel } = getNearestLevel(price, levels)
+  const isOptimalBuy = detectOptimalBuy(entry, levels)
 
   // Posición del precio en el rango (0 = low, 100 = high)
   const pricePos = ((price - low) / range) * 100
@@ -179,6 +189,21 @@ export default function FibonacciAnalysis({ entry }: Props) {
           })}
         </div>
       </div>
+
+      {/* Banner COMPRA ÓPTIMA — solo cuando hay confluencia Fib 61.8% + Z-Score */}
+      {isOptimalBuy && (
+        <div className="p-4 rounded-xl border-2 border-yellow-400 bg-yellow-400/10 flex flex-col gap-1.5 shadow-lg shadow-yellow-400/10">
+          <div className="flex items-center gap-2">
+            <span className="text-base">⭐</span>
+            <span className="text-sm font-bold text-yellow-400 tracking-wide">COMPRA ÓPTIMA</span>
+          </div>
+          <p className="text-xs text-yellow-200/80 leading-relaxed">
+            Confluencia perfecta: precio en el nivel dorado 61.8% de Fibonacci
+            con Z-Score en zona neutra ({entry.z_score !== null ? (entry.z_score > 0 ? '+' : '') + entry.z_score.toFixed(2) : '—'}).
+            Esto es lo que busca el smart money — estadística y acción de precio alineadas.
+          </p>
+        </div>
+      )}
 
       {/* Interpretación del nivel más cercano */}
       <div className={`p-4 rounded-xl border ${
