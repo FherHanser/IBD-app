@@ -3,6 +3,27 @@ import { StockEntry } from '../types'
 import ScoreBar from './ScoreBar'
 import RiskBadge from './RiskBadge'
 
+type SemaphoreState = 'green' | 'yellow' | 'red' | null
+
+function getSemaphore(entry: StockEntry): SemaphoreState {
+  const { price, high, low, z_score } = entry
+  if (high <= low) return null
+
+  const fib618 = high - (high - low) * 0.618
+  const distPct = Math.abs(price - fib618) / fib618 * 100
+
+  if (distPct <= 2.0 && z_score !== null && z_score >= -1.0 && z_score <= 0.3) return 'green'
+  if (z_score !== null && z_score > 1.5) return 'red'
+  if (distPct <= 5.0) return 'yellow'
+  return null
+}
+
+const SEMAPHORE_CONFIG = {
+  green:  { dot: '🟢', label: 'Compra óptima', color: 'text-gain'        },
+  yellow: { dot: '🟡', label: 'Preparar',       color: 'text-opportunity' },
+  red:    { dot: '🔴', label: 'Extendido',       color: 'text-loss'        },
+}
+
 interface Props {
   entry: StockEntry
   variant: 'gainer' | 'loser' | 'opportunity'
@@ -115,21 +136,24 @@ export default function StockRow({ entry, variant, rank, onClick }: Props) {
           </span>
         )}
 
-        {/* Z-Score (solo oportunidades) */}
-        {variant === 'opportunity' && entry.z_score !== null && (
-          <span className={
-            Math.abs(entry.z_score) <= 1.0 ? 'text-gain' :
-            Math.abs(entry.z_score) <= 1.8 ? 'text-opportunity' :
-            'text-loss'
-          } title={`Z-Score: ${entry.z_score > 0 ? '+' : ''}${entry.z_score} — ${
-            entry.z_score > 1.8  ? 'Sobrecomprado, riesgo de reversa' :
-            entry.z_score < -1.8 ? 'Sobrevendido, posible rebote' :
-            entry.z_score > 0    ? 'Por encima de media, momentum ok' :
-                                   'Por debajo de media, zona de valor'
-          }`}>
-            Z {entry.z_score > 0 ? '+' : ''}{entry.z_score.toFixed(1)}
-          </span>
-        )}
+        {/* Semáforo (solo oportunidades) */}
+        {variant === 'opportunity' && (() => {
+          const sem = getSemaphore(entry)
+          if (!sem) return null
+          const { dot, label, color } = SEMAPHORE_CONFIG[sem]
+          return (
+            <span
+              className={`text-xs font-semibold ${color}`}
+              title={
+                sem === 'green'  ? `Fibonacci 61.8% + Z-Score ${entry.z_score !== null ? (entry.z_score > 0 ? '+' : '') + entry.z_score.toFixed(2) : '—'} — confluencia óptima de compra` :
+                sem === 'red'    ? `Z-Score ${entry.z_score !== null ? '+' + entry.z_score.toFixed(2) : '—'} — precio muy extendido sobre su media` :
+                                   'Precio acercándose al nivel dorado 61.8% de Fibonacci'
+              }
+            >
+              {dot} {label}
+            </span>
+          )
+        })()}
 
         {/* R:R (solo oportunidades) */}
         {variant === 'opportunity' && entry.trade_levels && (
