@@ -38,44 +38,27 @@ export default function Dashboard({ data, wsStatus }: Props) {
         </div>
       )}
 
-      <main className="flex-1 p-2 sm:p-4 flex flex-col gap-3 sm:gap-4">
-        {/* Fila 1: Ganadoras y Perdedoras */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <StockTable
-            variant="gainer"
-            entries={data?.gainers ?? []}
-            loading={loading}
-            onSelectStock={setSelectedStock}
-          />
-          <StockTable
-            variant="loser"
-            entries={data?.losers ?? []}
-            loading={loading}
-            onSelectStock={setSelectedStock}
-          />
-        </div>
+      <main className="flex-1 p-2 sm:p-4 flex flex-col gap-4 sm:gap-5">
 
-        {/* Fila 2: Tentación de Compra — 3 rangos de precio */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <StockTable
-            variant="opp_low"
-            entries={data?.opp_low ?? []}
-            loading={loading}
-            onSelectStock={setSelectedStock}
-          />
-          <StockTable
-            variant="opp_mid"
-            entries={data?.opp_mid ?? []}
-            loading={loading}
-            onSelectStock={setSelectedStock}
-          />
-          <StockTable
-            variant="opp_top"
-            entries={data?.opp_top ?? []}
-            loading={loading}
-            onSelectStock={setSelectedStock}
-          />
-        </div>
+        {/* ── Movimiento del día ── */}
+        <section>
+          <SectionLabel label="Movimiento del día" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+            <StockTable variant="gainer" entries={data?.gainers ?? []} loading={loading} onSelectStock={setSelectedStock} />
+            <StockTable variant="loser"  entries={data?.losers  ?? []} loading={loading} onSelectStock={setSelectedStock} />
+          </div>
+        </section>
+
+        {/* ── Tentación de Compra ── */}
+        <section>
+          <SectionLabel label="Tentación de Compra" accent />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+            <StockTable variant="opp_low" entries={data?.opp_low ?? []} loading={loading} onSelectStock={setSelectedStock} />
+            <StockTable variant="opp_mid" entries={data?.opp_mid ?? []} loading={loading} onSelectStock={setSelectedStock} />
+            <StockTable variant="opp_top" entries={data?.opp_top ?? []} loading={loading} onSelectStock={setSelectedStock} />
+          </div>
+        </section>
+
       </main>
 
       <div className="px-4 pb-4">
@@ -89,6 +72,18 @@ export default function Dashboard({ data, wsStatus }: Props) {
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
       {selectedStock && <StockDetailModal entry={selectedStock} onClose={() => setSelectedStock(null)} />}
+    </div>
+  )
+}
+
+function SectionLabel({ label, accent = false }: { label: string; accent?: boolean }) {
+  return (
+    <div className="flex items-center gap-3 mb-3">
+      <div className={`h-px flex-1 ${accent ? 'bg-opportunity/30' : 'bg-surface-border'}`} />
+      <span className={`text-xs font-bold uppercase tracking-widest px-2 ${accent ? 'text-opportunity' : 'text-gray-500'}`}>
+        {label}
+      </span>
+      <div className={`h-px flex-1 ${accent ? 'bg-opportunity/30' : 'bg-surface-border'}`} />
     </div>
   )
 }
