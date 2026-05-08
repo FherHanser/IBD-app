@@ -8,7 +8,7 @@ from analysis.signals import get_market_session
 from data.fetcher import get_last_fetch_time, get_quote_snapshot
 from analysis.rankings import build_stock_entry
 from data.universe import STOCK_UNIVERSE, get_company_name, COMPANY_NAMES
-from data.db import get_win_stats
+from data.db import get_win_stats, get_symbol_history
 
 router = APIRouter()
 
@@ -129,6 +129,26 @@ def remove_from_watchlist(symbol: str):
     if symbol in _watchlist:
         _watchlist.remove(symbol)
     return {"message": f"{symbol} removido de watchlist", "watchlist": _watchlist}
+
+
+@router.get("/stats/symbol/{symbol}")
+async def get_symbol_stats(symbol: str):
+    """Historial de señales de un símbolo específico."""
+    rows = await get_symbol_history(symbol.upper())
+    result = []
+    for row in rows:
+        result.append({
+            "entry_price":  row["entry_price"],
+            "score":        row["score"],
+            "signal_type":  row["signal_type"],
+            "setup_key":    row["setup_key"],
+            "price_range":  row["price_range"],
+            "created_at":   row["created_at"].isoformat() if row["created_at"] else None,
+            "closed_price": row["closed_price"],
+            "return_pct":   row["return_pct"],
+            "closed_at":    row["closed_at"].isoformat() if row["closed_at"] else None,
+        })
+    return {"data": result}
 
 
 @router.get("/stats/winrate")

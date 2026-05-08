@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { MarketState, StockEntry } from '../types'
+import { MarketState, StockEntry, Alert } from '../types'
 import { WsStatus } from '../hooks/useWebSocket'
 import MarketHeader from './MarketHeader'
 import StockTable from './StockTable'
 import AlertPanel from './AlertPanel'
 import HelpModal from './HelpModal'
 import StockDetailModal from './StockDetailModal'
+import AlertDetailModal from './AlertDetailModal'
 
 interface Props {
   data: MarketState | null
@@ -16,6 +17,7 @@ export default function Dashboard({ data, wsStatus }: Props) {
   const loading = !data || data.status === 'initializing'
   const [showHelp, setShowHelp] = useState(false)
   const [selectedStock, setSelectedStock] = useState<StockEntry | null>(null)
+  const [selectedAlert, setSelectedAlert] = useState<{ alert: Alert; entry: StockEntry | null } | null>(null)
 
   return (
     <div className="min-h-screen flex flex-col bg-surface">
@@ -71,7 +73,7 @@ export default function Dashboard({ data, wsStatus }: Props) {
             ...(data?.opp_mid ?? []),
             ...(data?.opp_top ?? []),
           ]}
-          onSelectStock={setSelectedStock}
+          onSelectAlert={(alert, entry) => setSelectedAlert({ alert, entry })}
         />
       </div>
 
@@ -82,6 +84,19 @@ export default function Dashboard({ data, wsStatus }: Props) {
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
       {selectedStock && <StockDetailModal entry={selectedStock} onClose={() => setSelectedStock(null)} />}
+      {selectedAlert && (
+        <AlertDetailModal
+          alert={selectedAlert.alert}
+          entry={selectedAlert.entry}
+          winStats={data?.win_stats?.[selectedAlert.alert.type === 'opportunity_alert'
+            ? (selectedAlert.entry ? ['opp_low','opp_mid','opp_top'].find(b =>
+                (data?.[b as keyof MarketState] as StockEntry[] ?? []).some(e => e.symbol === selectedAlert.alert.symbol)
+              ) ?? '' : '')
+            : ''
+          ]}
+          onClose={() => setSelectedAlert(null)}
+        />
+      )}
     </div>
   )
 }

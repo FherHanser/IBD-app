@@ -4,7 +4,7 @@ import { Alert, StockEntry } from '../types'
 interface Props {
   alerts: Alert[]
   allEntries?: StockEntry[]
-  onSelectStock?: (entry: StockEntry) => void
+  onSelectAlert?: (alert: Alert, entry: StockEntry | null) => void
 }
 
 const TYPE_CONFIG = {
@@ -52,12 +52,11 @@ function ScoreDot({ score }: { score: number }) {
   )
 }
 
-export default function AlertPanel({ alerts, allEntries = [], onSelectStock }: Props) {
+export default function AlertPanel({ alerts, allEntries = [], onSelectAlert }: Props) {
   const entryMap = Object.fromEntries(allEntries.map(e => [e.symbol, e]))
 
-  const handleClick = (symbol: string) => {
-    const entry = entryMap[symbol]
-    if (entry && onSelectStock) onSelectStock(entry)
+  const handleClick = (alert: Alert) => {
+    if (onSelectAlert) onSelectAlert(alert, entryMap[alert.symbol] ?? null)
   }
 
   const oppAlerts    = alerts.filter(a => a.type === 'opportunity_alert')
@@ -89,8 +88,8 @@ export default function AlertPanel({ alerts, allEntries = [], onSelectStock }: P
               {oppAlerts.map((alert, i) => (
                 <div
                   key={i}
-                  onClick={() => handleClick(alert.symbol)}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border border-opportunity/20 bg-opportunity-bg transition-colors ${entryMap[alert.symbol] ? 'cursor-pointer hover:border-opportunity/50 hover:bg-opportunity/10' : ''}`}
+                  onClick={() => handleClick(alert)}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-opportunity/20 bg-opportunity-bg transition-colors cursor-pointer hover:border-opportunity/50 hover:bg-opportunity/10"
                 >
                   <span className="text-xs font-mono font-bold text-white w-5 text-right shrink-0">
                     {i + 1}
@@ -126,8 +125,8 @@ export default function AlertPanel({ alerts, allEntries = [], onSelectStock }: P
                 return (
                   <div
                     key={i}
-                    onClick={() => handleClick(alert.symbol)}
-                    className={`flex items-start gap-2 px-3 py-2 rounded-lg border ${border} ${bg} transition-colors ${entryMap[alert.symbol] ? 'cursor-pointer hover:opacity-80' : ''}`}
+                    onClick={() => handleClick(alert)}
+                    className={`flex items-start gap-2 px-3 py-2 rounded-lg border ${border} ${bg} transition-colors cursor-pointer hover:opacity-80`}
                   >
                     <Icon size={13} className={`${color} shrink-0 mt-0.5`} />
                     <div className="flex-1 min-w-0">

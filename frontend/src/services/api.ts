@@ -15,6 +15,7 @@ export const api = {
   losers: () => get<any>('/stocks/losers'),
   alerts: () => get<any>('/alerts'),
   stockDetail: (symbol: string) => get<any>(`/stocks/${symbol}`),
+  symbolHistory: (symbol: string) => get<any>(`/stats/symbol/${symbol}`),
   watchlist: () => get<any>('/watchlist'),
   addToWatchlist: (symbol: string) =>
     fetch(`${BASE}/watchlist/${symbol}`, { method: 'POST' }).then(r => r.json()),

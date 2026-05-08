@@ -129,6 +129,26 @@ async def close_old_alerts(price_map: dict[str, float]):
         logger.error(f"Error cerrando alertas: {e}")
 
 
+async def get_symbol_history(symbol: str) -> list[dict]:
+    """Retorna el historial de señales de un símbolo específico."""
+    if not _pool:
+        return []
+    try:
+        async with _pool.acquire() as conn:
+            rows = await conn.fetch("""
+                SELECT entry_price, score, signal_type, setup_key, price_range,
+                       created_at, closed_price, return_pct, closed_at
+                FROM alert_history
+                WHERE symbol = $1
+                ORDER BY created_at DESC
+                LIMIT 20
+            """, symbol)
+            return [dict(row) for row in rows]
+    except Exception as e:
+        logger.error(f"Error obteniendo historial de {symbol}: {e}")
+        return []
+
+
 async def get_win_stats() -> dict:
     """
     Retorna estadísticas de win rate por bucket de precio,

@@ -75,6 +75,18 @@ export interface StockEntry {
   z_score: number | null
 }
 
+export interface SymbolHistoryEntry {
+  entry_price: number
+  score: number
+  signal_type: string
+  setup_key: string
+  price_range: string
+  created_at: string
+  closed_price: number | null
+  return_pct: number | null
+  closed_at: string | null
+}
+
 export interface Alert {
   symbol: string
   price: number
