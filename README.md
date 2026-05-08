@@ -27,6 +27,7 @@ Monitorea **142 acciones del mercado americano** en tiempo real, las clasifica a
   - 🟢 **Compra óptima** — precio en Fibonacci 61.8% ± 2% y Z-Score normalizado
   - 🟡 **Preparar** — precio acercándose al nivel dorado (± 5%)
   - 🔴 **Extendido** — precio muy alejado de su media (Z-Score > 1.5)
+- Cuando se cumple la confluencia perfecta, el modal de detalle despliega el banner **⭐ COMPRA ÓPTIMA** — el nivel de precio más favorable según el análisis técnico combinado
 - Modal de detalle con análisis completo al hacer clic en cualquier acción
 
 ### Persistencia (Supabase / PostgreSQL)
