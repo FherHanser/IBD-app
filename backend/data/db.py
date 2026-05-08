@@ -14,7 +14,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-_pool: asyncpg.Pool | None = None
+_pool = None  # asyncpg.Pool | None
 
 
 async def init_db():
@@ -71,8 +71,8 @@ async def _create_tables():
                 return_pct   FLOAT,
                 closed_at    TIMESTAMPTZ
             );
-            CREATE INDEX IF NOT EXISTS idx_alert_symbol_date
-                ON alert_history (symbol, (created_at::date));
+            CREATE INDEX IF NOT EXISTS idx_alert_history_symbol
+                ON alert_history (symbol);
             CREATE INDEX IF NOT EXISTS idx_alert_closed
                 ON alert_history (closed_at) WHERE closed_at IS NULL;
         """)
