@@ -37,6 +37,7 @@ market_state: dict = {
 
 # Callbacks WebSocket (registrados por api/websocket.py)
 _ws_broadcast_callback = None
+_consecutive_errors = 0
 
 
 def register_broadcast(callback):
@@ -72,6 +73,9 @@ async def _update_market_data():
             if snap["symbol"] in detailed:
                 snap["df"] = detailed[snap["symbol"]]
 
+        global _consecutive_errors
+        _consecutive_errors = 0  # reset en ciclo exitoso
+
         # Calcular rankings
         rankings = compute_rankings(snapshots)
 
@@ -105,8 +109,12 @@ async def _update_market_data():
             await _ws_broadcast_callback(market_state)
 
     except Exception as e:
-        logger.error(f"Error en _update_market_data: {e}", exc_info=True)
-        market_state["status"] = "error"
+        global _consecutive_errors
+        _consecutive_errors += 1
+        logger.error(f"Error en _update_market_data ({_consecutive_errors} consecutivos): {e}", exc_info=True)
+        # Solo marcar error si falla 3 veces seguidas y no hay datos previos
+        if _consecutive_errors >= 3 or market_state.get("total_processed", 0) == 0:
+            market_state["status"] = "error"
 
 
 async def start_scheduler():

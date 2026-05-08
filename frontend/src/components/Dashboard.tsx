@@ -27,9 +27,14 @@ export default function Dashboard({ data, wsStatus }: Props) {
         onHelp={() => setShowHelp(true)}
       />
 
-      {data?.status === 'error' && (
-        <div className="mx-6 mt-4 p-3 rounded-lg bg-loss-bg border border-loss/30 text-loss text-xs">
+      {data?.status === 'error' && (data?.gainers?.length ?? 0) === 0 && (
+        <div className="mx-4 mt-3 p-3 rounded-lg bg-loss-bg border border-loss/30 text-loss text-xs">
           Error obteniendo datos. El sistema intentará reconectar automáticamente.
+        </div>
+      )}
+      {data?.status === 'error' && (data?.gainers?.length ?? 0) > 0 && (
+        <div className="mx-4 mt-3 p-2 rounded-lg bg-surface-border text-gray-500 text-xs text-center">
+          Actualizando datos...
         </div>
       )}
 
