@@ -29,13 +29,13 @@ export default function StockDetailModal({ entry, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-2 sm:p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-surface-card border border-surface-border rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto shadow-2xl">
+      <div className="bg-surface-card border border-surface-border rounded-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[92vh] overflow-y-auto shadow-2xl">
 
         {/* Header */}
-        <div className="sticky top-0 bg-surface-card border-b border-surface-border px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+        <div className="sticky top-0 bg-surface-card border-b border-surface-border px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-2xl z-10">
           <div className="flex items-center gap-3">
             <div>
               <div className="flex items-center gap-2">
@@ -60,15 +60,15 @@ export default function StockDetailModal({ entry, onClose }: Props) {
           </div>
         </div>
 
-        <div className="px-6 py-5 flex flex-col gap-6">
+        <div className="px-3 sm:px-6 py-4 sm:py-5 flex flex-col gap-4 sm:gap-6">
 
           {/* Señal + score */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 p-3 bg-surface rounded-xl border border-surface-border">
               <p className="text-xs text-gray-500 mb-1">Señal</p>
               <p className={`text-sm font-semibold ${signalColor}`}>{entry.signal}</p>
             </div>
-            <div className="w-52 p-3 bg-surface rounded-xl border border-surface-border">
+            <div className="sm:w-52 p-3 bg-surface rounded-xl border border-surface-border">
               <p className="text-xs text-gray-500 mb-2">Score de oportunidad</p>
               <ScoreBar score={entry.score} band={entry.score_band} icon={entry.score_icon} />
             </div>
@@ -100,7 +100,7 @@ export default function StockDetailModal({ entry, onClose }: Props) {
               <p className="text-xs text-gray-500 mb-1.5 flex items-center gap-1.5">
                 <Clock size={11} /> Señal activa
               </p>
-              <div className="flex items-center gap-4 text-sm">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm">
                 <span className="text-gray-300">
                   Hace <strong className="text-white">{entry.signal_age.minutes_ago} min</strong>
                 </span>
@@ -151,7 +151,7 @@ export default function StockDetailModal({ entry, onClose }: Props) {
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
               <Activity size={12} /> Datos del día
             </h3>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {[
                 { label: 'Apertura',  value: `$${entry.open.toFixed(2)}`,           color: 'text-gray-300' },
                 { label: 'Máximo',    value: `$${entry.high.toFixed(2)}`,            color: 'text-gain'     },
@@ -174,7 +174,7 @@ export default function StockDetailModal({ entry, onClose }: Props) {
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
                 Contexto día anterior
               </h3>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {entry.prev_close && (
                   <div className="px-3 py-2 bg-surface rounded-lg border border-surface-border">
                     <p className="text-xs text-gray-500">Cierre ant.</p>
@@ -406,7 +406,7 @@ function VwapBands({ entry }: { entry: StockEntry }) {
   if (!levels.length) return null
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+    <div className="grid grid-cols-3 gap-2 md:grid-cols-5">
       {levels.map(({ label, value, color }) => {
         const isCurrent = entry.price >= value * 0.999 && entry.price <= value * 1.001
         return (

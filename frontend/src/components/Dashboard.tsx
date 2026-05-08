@@ -33,7 +33,7 @@ export default function Dashboard({ data, wsStatus }: Props) {
         </div>
       )}
 
-      <main className="flex-1 p-4 flex flex-col gap-4">
+      <main className="flex-1 p-2 sm:p-4 flex flex-col gap-3 sm:gap-4">
         {/* Fila 1: Ganadoras y Perdedoras */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <StockTable
@@ -77,7 +77,7 @@ export default function Dashboard({ data, wsStatus }: Props) {
         <AlertPanel alerts={data?.alerts ?? []} />
       </div>
 
-      <footer className="border-t border-surface-border px-6 py-2 text-xs text-gray-700 flex justify-between">
+      <footer className="border-t border-surface-border px-4 py-2 text-xs text-gray-700 flex flex-col sm:flex-row sm:justify-between gap-1">
         <span>CNTNL - VALUE v1.0 · Datos con 15 min de delay via Yahoo Finance</span>
         <span>No es asesoramiento financiero. Úsalo con criterio propio.</span>
       </footer>

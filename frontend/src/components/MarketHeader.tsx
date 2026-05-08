@@ -11,69 +11,66 @@ interface Props {
 }
 
 const SESSION_COLORS: Record<string, string> = {
-  market: 'text-gain',
-  pre_market: 'text-opportunity',
+  market:      'text-gain',
+  pre_market:  'text-opportunity',
   after_hours: 'text-opportunity',
-  closed: 'text-gray-500',
+  closed:      'text-gray-500',
 }
 
 const SESSION_DOT: Record<string, string> = {
-  market: 'bg-gain animate-pulse',
-  pre_market: 'bg-opportunity',
+  market:      'bg-gain animate-pulse',
+  pre_market:  'bg-opportunity',
   after_hours: 'bg-opportunity',
-  closed: 'bg-gray-600',
+  closed:      'bg-gray-600',
 }
 
 export default function MarketHeader({ session, lastUpdate, wsStatus, totalProcessed, onHelp }: Props) {
-  const sessionKey = session?.session ?? 'closed'
-  const colorClass = SESSION_COLORS[sessionKey] ?? 'text-gray-400'
-  const dotClass = SESSION_DOT[sessionKey] ?? 'bg-gray-600'
+  const sessionKey  = session?.session ?? 'closed'
+  const colorClass  = SESSION_COLORS[sessionKey] ?? 'text-gray-400'
+  const dotClass    = SESSION_DOT[sessionKey]    ?? 'bg-gray-600'
 
   const formattedUpdate = lastUpdate
     ? new Date(lastUpdate).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     : '—'
 
   return (
-    <header className="border-b border-surface-border bg-surface-card px-6 py-3">
-      <div className="flex items-center justify-between">
-        {/* Logo + título */}
-        <div className="flex items-center gap-3">
-          <Activity className="text-brand" size={22} />
+    <header className="border-b border-surface-border bg-surface-card px-4 sm:px-6 py-3">
+      {/* Fila principal */}
+      <div className="flex items-center justify-between gap-2">
+
+        {/* Logo */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Activity className="text-brand" size={20} />
           <div>
-            <h1 className="text-sm font-semibold text-white tracking-wide">
-              CNTNL - VALUE
-            </h1>
-            <p className="text-xs text-gray-500">Alertas y Señales Intradía</p>
+            <h1 className="text-sm font-semibold text-white tracking-wide">CNTNL - VALUE</h1>
+            <p className="text-xs text-gray-500 hidden sm:block">Alertas y Señales Intradía</p>
           </div>
         </div>
 
-        {/* Sesión de mercado */}
-        <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${dotClass}`} />
-          <span className={`text-sm font-semibold ${colorClass}`}>
+        {/* Sesión — centro */}
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className={`w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
+          <span className={`text-xs sm:text-sm font-semibold truncate ${colorClass}`}>
             {session?.label ?? 'Conectando...'}
           </span>
           {session?.time_et && (
-            <span className="text-xs text-gray-500 ml-1">{session.time_et}</span>
+            <span className="text-xs text-gray-500 hidden md:inline">{session.time_et}</span>
           )}
         </div>
 
-        {/* Stats + estado de conexión */}
-        <div className="flex items-center gap-4 text-xs text-gray-500">
-          <span>{totalProcessed > 0 ? `${totalProcessed} acciones` : '—'}</span>
-
-          <div className="flex items-center gap-1">
-            <Clock size={12} />
-            <span>
-              Actualizado: <span className="text-gray-300">{formattedUpdate}</span>
-            </span>
+        {/* Derecha */}
+        <div className="flex items-center gap-2 sm:gap-4 text-xs text-gray-500 shrink-0">
+          {/* Stats — solo md+ */}
+          <div className="hidden md:flex items-center gap-4">
+            {totalProcessed > 0 && <span>{totalProcessed} acciones</span>}
+            <div className="flex items-center gap-1">
+              <Clock size={12} />
+              <span>Actualizado: <span className="text-gray-300">{formattedUpdate}</span></span>
+            </div>
+            <span className="text-gray-600">15 min delay</span>
           </div>
 
           <WsIndicator status={wsStatus} />
-
-          <div className="text-gray-600 text-xs">
-            15 min delay
-          </div>
 
           <button
             onClick={onHelp}
@@ -81,9 +78,19 @@ export default function MarketHeader({ session, lastUpdate, wsStatus, totalProce
             title="Cómo leer el tablero"
           >
             <HelpCircle size={15} />
-            <span className="text-xs">Ayuda</span>
+            <span className="hidden sm:inline text-xs">Ayuda</span>
           </button>
         </div>
+      </div>
+
+      {/* Fila secundaria — visible solo en sm, oculta en md+ (donde ya aparece arriba) */}
+      <div className="flex sm:flex md:hidden items-center gap-3 text-xs text-gray-500 mt-1.5 pl-7">
+        {totalProcessed > 0 && <span>{totalProcessed} acc.</span>}
+        <div className="flex items-center gap-1">
+          <Clock size={11} />
+          <span className="text-gray-300">{formattedUpdate}</span>
+        </div>
+        <span className="text-gray-600">15 min delay</span>
       </div>
     </header>
   )
@@ -94,7 +101,7 @@ function WsIndicator({ status }: { status: WsStatus }) {
     return (
       <div className="flex items-center gap-1 text-gain">
         <Wifi size={13} />
-        <span>En vivo</span>
+        <span className="hidden sm:inline">En vivo</span>
       </div>
     )
   }
@@ -102,14 +109,14 @@ function WsIndicator({ status }: { status: WsStatus }) {
     return (
       <div className="flex items-center gap-1 text-opportunity animate-pulse">
         <Wifi size={13} />
-        <span>Conectando...</span>
+        <span className="hidden sm:inline">Conectando...</span>
       </div>
     )
   }
   return (
     <div className="flex items-center gap-1 text-loss">
       <WifiOff size={13} />
-      <span>Desconectado</span>
+      <span className="hidden sm:inline">Desconectado</span>
     </div>
   )
 }
