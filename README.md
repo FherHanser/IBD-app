@@ -63,7 +63,11 @@ Monitorea **142 acciones del mercado americano** en tiempo real, las clasifica a
 
 **Solución:** El sistema hace el screening automático y presenta solo lo accionable — las acciones con confluencia técnica real (volumen, tendencia, nivel de precio, momentum) ordenadas por probabilidad de éxito según puntaje.
 
-El historial de efectividad convierte el sistema en algo que se **valida solo con el tiempo**: no es opinión, es estadística real de cuántas señales resultaron en +1% en 24 horas.
+**El nivel dorado:** Cuando el precio de una acción coincide con el retroceso de Fibonacci 61.8% del rango del día y el Z-Score indica que no está sobreextendido, el sistema activa el banner **⭐ COMPRA ÓPTIMA** — la confluencia más precisa entre precio justo y momentum controlado.
+
+**Semáforo de entrada:** Cada tarjeta de oportunidad muestra 🟢🟡🔴 para que de un vistazo sepas si el momento de entrada es óptimo, se está acercando, o el precio ya corrió demasiado.
+
+**Validación con datos reales:** El historial de efectividad convierte el sistema en algo que se valida solo con el tiempo — no es opinión, es estadística real de cuántas señales resultaron en +1% en 24 horas.
 
 ---
 
